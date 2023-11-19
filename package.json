@@ -1,0 +1,40 @@
+{
+  "name": "mp3starter-backend",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "rimraf dist && tsc",
+    "prestart": "npm run build",
+    "start": "node ./bin/www",
+    "predevStart": "npm run build",
+    "devStart": "concurrently \"tsc -w\" \" nodemon ./bin/www\""
+  },
+  "dependencies": {
+    "concurrently": "^8.2.2",
+    "cookie-parser": "~1.4.4",
+    "cors": "^2.8.5",
+    "debug": "~2.6.9",
+    "essentia.js": "^0.1.3",
+    "express": "^4.18.2",
+    "express-async-handler": "^1.2.0",
+    "express-rate-limit": "^7.1.4",
+    "express-validator": "^7.0.1",
+    "helmet": "^7.1.0",
+    "http-errors": "~1.6.3",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "~1.9.1",
+    "pug": "^2.0.4",
+    "rimraf": "^5.0.5",
+    "ytdl-core": "^4.11.5"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.6",
+    "@types/cors": "^2.8.16",
+    "@types/http-errors": "^2.0.4",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^20.9.2",
+    "nodemon": "^3.0.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  }
+}
