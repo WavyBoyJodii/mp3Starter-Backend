@@ -61,6 +61,13 @@ router.post(
             console.log(`File ${downloadTitle} deleted after 5 minutes.`);
           }
         });
+        fs.unlink(webmFilePath, (deleteError) => {
+          if (deleteError) {
+            console.error('Error deleting file:', deleteError);
+          } else {
+            console.log(`File ${downloadTitle} deleted after 5 minutes.`);
+          }
+        });
       }, 5 * 60 * 1000); // 5 minutes in milliseconds
       // const audioFormats = ytdl.filterFormats(videoInfo.formats, 'audioonly');
       // const { key, bpm } = await getBpmAndKey(mp3FilePath);
