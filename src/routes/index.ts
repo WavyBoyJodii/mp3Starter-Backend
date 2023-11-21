@@ -24,8 +24,7 @@ router.post(
       // object of metadata from the youtube video url
       const videoInfo = await ytdl.getInfo(url);
       const vidTitle = videoInfo.player_response.videoDetails.title;
-      const vidThumbnail =
-        videoInfo.player_response.videoDetails.thumbnails[3].url;
+      const vidThumbnail = videoInfo.videoDetails.thumbnails[3].url;
       const downloadTitle = `${vidTitle}.mp3`;
 
       const webmFilePath = path.join(downloadsFolder, `${vidTitle}.webm`);
@@ -71,9 +70,10 @@ router.post(
       }, 5 * 60 * 1000); // 5 minutes in milliseconds
       // const audioFormats = ytdl.filterFormats(videoInfo.formats, 'audioonly');
       // const { key, bpm } = await getBpmAndKey(mp3FilePath);
-      res
-        .status(200)
-        .json({ title: `${downloadTitle}`, thumbnail: `${vidThumbnail}` });
+      res.status(200).json({
+        title: `${downloadTitle}`,
+        vidThumbnail,
+      });
     } catch (err) {
       console.log(err);
       res.status(404).json({ err });
