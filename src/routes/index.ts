@@ -7,6 +7,7 @@ import ffmpegPath = require('@ffmpeg-installer/ffmpeg');
 import ffmpeg from 'fluent-ffmpeg';
 ffmpeg.setFfmpegPath(ffmpegPath.path);
 import path from 'path';
+import validator from 'validator';
 const downloadsFolder = path.join(__dirname, '../downloads');
 
 /* GET home page. */
@@ -25,10 +26,15 @@ router.post(
       const videoInfo = await ytdl.getInfo(url);
       const vidTitle = videoInfo.player_response.videoDetails.title;
       const vidThumbnail = videoInfo.videoDetails.thumbnails[3].url;
-      const downloadTitle = `${vidTitle}.mp3`;
+      const downloadTitle = `${validator.escape(
+        vidTitle.replace(/\s+/g, '').slice(0, 15)
+      )}.mp3`;
 
-      const webmFilePath = path.join(downloadsFolder, `${vidTitle}.webm`);
-      const mp3FilePath = path.join(downloadsFolder, `${vidTitle}.mp3`);
+      const webmFilePath = path.join(
+        downloadsFolder,
+        `${validator.escape(vidTitle.replace(/\s+/g, '')).slice(0, 15)}.webm`
+      );
+      const mp3FilePath = path.join(downloadsFolder, `${downloadTitle}`);
 
       const downloadStream = ytdl(url, {
         filter: 'audioonly',
@@ -71,7 +77,8 @@ router.post(
       // const audioFormats = ytdl.filterFormats(videoInfo.formats, 'audioonly');
       // const { key, bpm } = await getBpmAndKey(mp3FilePath);
       res.status(200).json({
-        title: `${downloadTitle}`,
+        title: `${vidTitle}`,
+        downloadTitle,
         vidThumbnail,
       });
     } catch (err) {
@@ -83,6 +90,7 @@ router.post(
 
 router.get('/download/:filename', (req, res) => {
   const filename = req.params.filename;
+  console.log(filename);
   const filePath = path.join(downloadsFolder, filename);
 
   // Send the file as the response

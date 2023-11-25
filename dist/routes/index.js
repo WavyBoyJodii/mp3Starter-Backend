@@ -12,6 +12,7 @@ const ffmpegPath = require("@ffmpeg-installer/ffmpeg");
 const fluent_ffmpeg_1 = __importDefault(require("fluent-ffmpeg"));
 fluent_ffmpeg_1.default.setFfmpegPath(ffmpegPath.path);
 const path_1 = __importDefault(require("path"));
+const validator_1 = __importDefault(require("validator"));
 const downloadsFolder = path_1.default.join(__dirname, '../downloads');
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -25,9 +26,9 @@ router.post('/mp3', (0, express_async_handler_1.default)(async (req, res, next) 
         const videoInfo = await ytdl.getInfo(url);
         const vidTitle = videoInfo.player_response.videoDetails.title;
         const vidThumbnail = videoInfo.videoDetails.thumbnails[3].url;
-        const downloadTitle = `${vidTitle}.mp3`;
-        const webmFilePath = path_1.default.join(downloadsFolder, `${vidTitle}.webm`);
-        const mp3FilePath = path_1.default.join(downloadsFolder, `${vidTitle}.mp3`);
+        const downloadTitle = `${validator_1.default.escape(vidTitle.replace(/\s+/g, '').slice(0, 15))}.mp3`;
+        const webmFilePath = path_1.default.join(downloadsFolder, `${validator_1.default.escape(vidTitle.replace(/\s+/g, '')).slice(0, 15)}.webm`);
+        const mp3FilePath = path_1.default.join(downloadsFolder, `${downloadTitle}`);
         const downloadStream = ytdl(url, {
             filter: 'audioonly',
             quality: 'highestaudio',
@@ -68,7 +69,8 @@ router.post('/mp3', (0, express_async_handler_1.default)(async (req, res, next) 
         // const audioFormats = ytdl.filterFormats(videoInfo.formats, 'audioonly');
         // const { key, bpm } = await getBpmAndKey(mp3FilePath);
         res.status(200).json({
-            title: `${downloadTitle}`,
+            title: `${vidTitle}`,
+            downloadTitle,
             vidThumbnail,
         });
     }
@@ -79,6 +81,7 @@ router.post('/mp3', (0, express_async_handler_1.default)(async (req, res, next) 
 }));
 router.get('/download/:filename', (req, res) => {
     const filename = req.params.filename;
+    console.log(filename);
     const filePath = path_1.default.join(downloadsFolder, filename);
     // Send the file as the response
     res.download(filePath, (err) => {
