@@ -91,5 +91,19 @@ router.get('/download/:filename', (req, res) => {
         }
     });
 });
+router.get('/clientdownload/:filename', (req, res) => {
+    const filename = req.params.filename;
+    console.log(filename);
+    const filePath = path_1.default.join(downloadsFolder, filename);
+    res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+    res.setHeader('Content-Type', 'application/octet-stream');
+    // Send the file as the response
+    res.sendFile(filePath, (err) => {
+        if (err) {
+            console.error('Error sending file', err);
+            res.status(500).json({ error: 'Internal Service Error' });
+        }
+    });
+});
 exports.default = router;
 //# sourceMappingURL=index.js.map
