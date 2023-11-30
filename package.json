@@ -3,12 +3,12 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "rimraf": "./node_modules/rimraf/dist/esm/bin.mjs",
     "build": "rimraf dist && tsc",
     "prestart": "npm run build",
     "start": "node ./bin/www",
     "predevStart": "npm run build",
-    "devStart": "concurrently \"tsc -w\" \" nodemon ./bin/www\"",
-    "rimraf": "./node_modules/rimraf/dist/esm/bin.mjs"
+    "devStart": "concurrently \"tsc -w\" \" nodemon ./bin/www\""
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
