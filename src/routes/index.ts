@@ -73,7 +73,7 @@ router.post(
             console.log(`File ${downloadTitle} deleted after 5 minutes.`);
           }
         });
-      }, 5 * 60 * 1000); // 5 minutes in milliseconds
+      }, 8 * 60 * 1000); // 8 minutes in milliseconds
       // const audioFormats = ytdl.filterFormats(videoInfo.formats, 'audioonly');
       // const { key, bpm } = await getBpmAndKey(mp3FilePath);
       res.status(200).json({
