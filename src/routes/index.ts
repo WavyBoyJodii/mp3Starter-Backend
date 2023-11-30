@@ -94,13 +94,29 @@ router.post(
         mp3Buffer = Buffer.concat([mp3Buffer, chunk]);
         done();
       };
+      const command = new GetObjectCommand({
+        Bucket: bucketName,
+        Key: downloadTitle,
+      });
+
+      async function getDownloadLink() {
+        const url = await getSignedUrl(s3, command, { expiresIn: 300 });
+        return url;
+      }
 
       ffmpeg(downloadStream)
         .audioCodec('libmp3lame')
         .toFormat('mp3')
         .on('end', () => {
           console.log('Conversion to mp3 Finished');
-          uploadToS3(downloadTitle, mp3Buffer); // End the s3 Stream when the conversion is completed
+          uploadToS3(downloadTitle, mp3Buffer);
+          const downloadUrl = getDownloadLink();
+          res.status(200).json({
+            title: `${vidTitle}`,
+            downloadUrl,
+            downloadTitle,
+            vidThumbnail,
+          });
           setTimeout(() => {
             deleteFileFromS3(bucketName, downloadTitle);
           }, 5 * 60 * 1000);
@@ -109,12 +125,6 @@ router.post(
           console.error('Error converting to MP3', err);
         })
         .pipe(mp3Stream);
-
-      res.status(200).json({
-        title: `${vidTitle}`,
-        downloadTitle,
-        vidThumbnail,
-      });
     } catch (err) {
       console.log(err);
       res.status(404).json({ err });
