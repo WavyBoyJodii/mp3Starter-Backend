@@ -3,8 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "rimraf": "./node_modules/rimraf/dist/esm/bin.mjs",
-    "build": "rimraf dist && tsc",
+    "build": "tsc",
     "prestart": "npm run build",
     "start": "node ./bin/www",
     "predevStart": "npm run build",
