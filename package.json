@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "rimraf dist && tsc",
+    "build": "npm install && rimraf dist && tsc",
     "prestart": "npm run build",
     "start": "node ./bin/www",
     "predevStart": "npm run build",
