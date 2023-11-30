@@ -10,7 +10,14 @@ import path from 'path';
 import validator from 'validator';
 const downloadsFolder = path.join(__dirname, '../downloads');
 // const AWS = require('aws-sdk');
-import AWS from 'aws-sdk';
+// import AWS from 'aws-sdk';
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+  GetObjectCommand,
+} from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Writable } from 'stream';
 
 /* GET home page. */
@@ -24,7 +31,13 @@ router.post(
     try {
       // url given by the client via frontend
       const url = req.body.url;
-      const s3 = new AWS.S3();
+      const s3 = new S3Client({
+        region: process.env.AWS_REGION,
+        credentials: {
+          accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+        },
+      });
 
       const bucketName = 'cyclic-wig-bullfrog-us-east-1';
 
@@ -42,7 +55,7 @@ router.post(
       });
 
       // Function to upload the buffer to S3
-      function uploadToS3(key: string, buffer: Buffer) {
+      async function uploadToS3(key: string, buffer: Buffer) {
         const params = {
           Bucket: bucketName,
           Key: key,
@@ -50,26 +63,23 @@ router.post(
           ContentType: 'audio/mpeg', // Set the correct content type based on the file type
         };
 
-        s3.upload(
-          params,
-          (
-            err: Error | null,
-            data: AWS.S3.ManagedUpload.SendData | undefined
-          ) => {
-            if (err) {
-              console.error('Error uploading to S3:', err);
-            } else {
-              console.log('File uploaded to S3:', data.Location);
-            }
-          }
-        );
+        const command = new PutObjectCommand(params);
+
+        try {
+          await s3.send(command);
+          console.log('File uploaded to S3', key);
+        } catch (error) {
+          console.error('Error uploading file to S3', error);
+        }
       }
 
       // Function to delete the file from S3
       async function deleteFileFromS3(bucket: string, key: string) {
+        const params = { Bucket: bucket, Key: key };
+        const command = new DeleteObjectCommand(params);
         try {
           // Delete the file from S3
-          await s3.deleteObject({ Bucket: bucket, Key: key }).promise();
+          await s3.send(command);
           console.log(`File ${key} deleted from S3.`);
         } catch (error) {
           console.error('Error deleting file from S3:', error);
@@ -115,48 +125,63 @@ router.post(
 router.get('/download/:filename', (req, res) => {
   const filename = req.params.filename;
   console.log(filename);
-  const s3 = new AWS.S3();
-  // const filePath = path.join(downloadsFolder, filename);
+  const s3 = new S3Client({
+    region: process.env.AWS_REGION,
+    credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    },
+  });
   const bucket = 'cyclic-wig-bullfrog-us-east-1';
+  const command = new GetObjectCommand({ Bucket: bucket, Key: filename });
+
+  async function getDownloadLink() {
+    const url = await getSignedUrl(s3, command, { expiresIn: 300 });
+    res.redirect(url);
+  }
+  getDownloadLink();
+
+  // const filePath = path.join(downloadsFolder, filename);
 
   // generate a pre-signed URL for the s3 object
-  const params = {
-    Bucket: bucket,
-    Key: filename,
-    Expires: 300,
-  };
 
-  s3.getSignedUrl('getObject', params, (err, url) => {
-    if (err) {
-      console.error('Error generating pre-signed URL:', err);
-      res.status(500).json({ error: 'Internal Server Error' });
-    } else {
-      res.redirect(url);
-    }
-  });
+  // s3.getSignedUrl('getObject', params, (err, url) => {
+  //   if (err) {
+  //     console.error('Error generating pre-signed URL:', err);
+  //     res.status(500).json({ error: 'Internal Server Error' });
+  //   } else {
+  //     res.redirect(url);
+  //   }
+  // });
 });
 
 router.get('/clientdownload/:filename', (req, res) => {
   const filename = req.params.filename;
   console.log(filename);
-  const s3 = new AWS.S3();
-  const bucket = 'cyclic-wig-bullfrog-us-east-1';
-
-  // generate a pre-signed URL for the s3 object
-  const params = {
-    Bucket: bucket,
-    Key: filename,
-    Expires: 300,
-  };
-
-  s3.getSignedUrl('getObject', params, (err, url) => {
-    if (err) {
-      console.error('Error generating pre-signed URL:', err);
-      res.status(500).json({ error: 'Internal Server Error' });
-    } else {
-      res.redirect(url);
-    }
+  const s3 = new S3Client({
+    region: process.env.AWS_REGION,
+    credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    },
   });
+  const bucket = 'cyclic-wig-bullfrog-us-east-1';
+  const command = new GetObjectCommand({ Bucket: bucket, Key: filename });
+
+  async function getDownloadLink() {
+    const url = await getSignedUrl(s3, command, { expiresIn: 300 });
+    res.redirect(url);
+  }
+  getDownloadLink();
+
+  // s3.getSignedUrl('getObject', params, (err, url) => {
+  //   if (err) {
+  //     console.error('Error generating pre-signed URL:', err);
+  //     res.status(500).json({ error: 'Internal Server Error' });
+  //   } else {
+  //     res.redirect(url);
+  //   }
+  // });
 });
 
 export default router;
