@@ -12,7 +12,6 @@ const downloadsFolder = path.join(__dirname, '../downloads');
 // const AWS = require('aws-sdk');
 import AWS from 'aws-sdk';
 import { Writable } from 'stream';
-const s3 = new AWS.S3();
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -25,6 +24,7 @@ router.post(
     try {
       // url given by the client via frontend
       const url = req.body.url;
+      const s3 = new AWS.S3();
 
       const bucketName = 'cyclic-wig-bullfrog-us-east-1';
 
@@ -115,6 +115,7 @@ router.post(
 router.get('/download/:filename', (req, res) => {
   const filename = req.params.filename;
   console.log(filename);
+  const s3 = new AWS.S3();
   // const filePath = path.join(downloadsFolder, filename);
   const bucket = 'cyclic-wig-bullfrog-us-east-1';
 
@@ -138,6 +139,7 @@ router.get('/download/:filename', (req, res) => {
 router.get('/clientdownload/:filename', (req, res) => {
   const filename = req.params.filename;
   console.log(filename);
+  const s3 = new AWS.S3();
   const bucket = 'cyclic-wig-bullfrog-us-east-1';
 
   // generate a pre-signed URL for the s3 object
