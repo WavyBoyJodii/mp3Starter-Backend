@@ -19,6 +19,8 @@ import {
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Writable } from 'stream';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
