@@ -99,22 +99,21 @@ router.post(
         Key: downloadTitle,
       });
 
-      await new Promise((resolve, reject) => {
-        ffmpeg(downloadStream)
-          .audioCodec('libmp3lame')
-          .toFormat('mp3')
-          .on('end', () => {
-            console.log('Conversion to mp3 Finished');
-            uploadToS3(downloadTitle, mp3Buffer);
-            setTimeout(() => {
-              deleteFileFromS3(bucketName, downloadTitle);
-            }, 5 * 60 * 1000);
-          })
-          .on('error', (err) => {
-            console.error('Error converting to MP3', err);
-          })
-          .pipe(mp3Stream);
-      });
+      ffmpeg(downloadStream)
+        .audioCodec('libmp3lame')
+        .toFormat('mp3')
+        .on('end', () => {
+          console.log('Conversion to mp3 Finished');
+          uploadToS3(downloadTitle, mp3Buffer);
+          setTimeout(() => {
+            deleteFileFromS3(bucketName, downloadTitle);
+          }, 5 * 60 * 1000);
+        })
+        .on('error', (err) => {
+          console.error('Error converting to MP3', err);
+        })
+        .pipe(mp3Stream);
+
       const downloadUrl = await getSignedUrl(s3, command, { expiresIn: 300 });
       res.status(200).json({
         title: `${vidTitle}`,
