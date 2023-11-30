@@ -99,11 +99,6 @@ router.post(
         Key: downloadTitle,
       });
 
-      async function getDownloadLink() {
-        const url = await getSignedUrl(s3, command, { expiresIn: 300 });
-        return url;
-      }
-
       await new Promise((resolve, reject) => {
         ffmpeg(downloadStream)
           .audioCodec('libmp3lame')
@@ -120,7 +115,7 @@ router.post(
           })
           .pipe(mp3Stream);
       });
-      const downloadUrl = getDownloadLink();
+      const downloadUrl = await getSignedUrl(s3, command, { expiresIn: 300 });
       res.status(200).json({
         title: `${vidTitle}`,
         downloadUrl,
