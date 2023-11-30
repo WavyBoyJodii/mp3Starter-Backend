@@ -7,7 +7,8 @@
     "prestart": "npm run build",
     "start": "node ./bin/www",
     "predevStart": "npm run build",
-    "devStart": "concurrently \"tsc -w\" \" nodemon ./bin/www\""
+    "devStart": "concurrently \"tsc -w\" \" nodemon ./bin/www\"",
+    "rimraf": "./node_modules/rimraf/bin.js"
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
