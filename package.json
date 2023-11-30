@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "aws-sdk": "^2.1506.0",
     "concurrently": "^8.2.2",
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
