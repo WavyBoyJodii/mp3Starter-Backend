@@ -26,9 +26,12 @@ router.post(
       const videoInfo = await ytdl.getInfo(url);
       const vidTitle = videoInfo.player_response.videoDetails.title;
       const vidThumbnail = videoInfo.videoDetails.thumbnails[3].url;
+      // Generate a timestamp to append to the file name
+      const timestamp = Date.now();
+
       const downloadTitle = `${validator.escape(
         vidTitle.replace(/\s+/g, '').slice(0, 15)
-      )}.mp3`;
+      )}_${timestamp}.mp3`;
 
       const webmFilePath = path.join(
         downloadsFolder,
