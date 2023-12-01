@@ -8,7 +8,7 @@ import helmet from 'helmet';
 import RateLimit from 'express-rate-limit';
 const limiter = RateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
-  max: 50,
+  max: 5000,
 });
 
 import indexRouter from './routes/index';
