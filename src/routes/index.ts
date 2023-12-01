@@ -35,7 +35,9 @@ router.post(
 
       const webmFilePath = path.join(
         downloadsFolder,
-        `${validator.escape(vidTitle.replace(/\s+/g, '')).slice(0, 15)}.webm`
+        `${validator
+          .escape(vidTitle.replace(/\s+/g, ''))
+          .slice(0, 15)}_${timestamp}.webm`
       );
       const mp3FilePath = path.join(downloadsFolder, `${downloadTitle}`);
 
